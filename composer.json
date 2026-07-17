@@ -1,0 +1,16 @@
+{
+    "name": "alxvk/filemerger",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Alxvk\\Filemerger\\": "src/app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "projectdead93",
+            "email": "alxvkei93@gmail.com"
+        }
+    ],
+    "require": {}
+}
