@@ -9,12 +9,12 @@ class ComposerStaticInit93011b8473ed9395c55567bdd1ceb323
     public static $prefixLengthsPsr4 = array (
         'A' => 
         array (
-            'Alxvk\\Filemerger\\' => 17,
+            'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Alxvk\\Filemerger\\' => 
+        'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app',
         ),

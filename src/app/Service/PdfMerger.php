@@ -4,11 +4,14 @@ namespace App\Service;
 
 use RuntimeException;
 
+use App\Service\Logger;
+
 class PdfMerger
 {
     public function __construct(
         private string $qpdfPath,
-        private string $tempDir
+        private string $tempDir,
+        private Logger $logger
     ) {}
 
     /**
@@ -20,20 +23,25 @@ class PdfMerger
 
         $lines = ['--empty', '--pages'];
         foreach ($inputFiles as $file) {
-            $lines[] = escapeshellarg($file);
+            $lines[] = $file;
         }
         $lines[] = '--';
-        $lines[] = escapeshellarg($outputFile);
+        $lines[] = $outputFile;
 
         file_put_contents($responseFile, implode("\n", $lines));
 
         $cmd = sprintf('%s @%s 2>&1', escapeshellarg($this->qpdfPath), escapeshellarg($responseFile));
+
         exec($cmd, $out, $exitCode);
 
-        unlink($responseFile);
+        if (file_exists($responseFile)) {
+            @unlink($responseFile);
+        }
 
         if ($exitCode !== 0) {
             throw new RuntimeException('qpdf merge failed: ' . implode("\n", $out));
         }
+
+        $this->logger->info("Merged " . count($inputFiles) . " files -> $outputFile");
     }
 }

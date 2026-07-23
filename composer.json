@@ -3,7 +3,7 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "Alxvk\\Filemerger\\": "src/app/"
+            "App\\": "src/app/"
         }
     },
     "authors": [

@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Alxvk\\Filemerger\\' => array($baseDir . '/src/app'),
+    'App\\' => array($baseDir . '/src/app'),
 );
