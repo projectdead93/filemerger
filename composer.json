@@ -12,5 +12,9 @@
             "email": "alxvkei93@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+     "scripts": {
+        "merge": "php bin/merge.php",
+        "serve": "php -S localhost:8000 -t public"
+    }
 }
