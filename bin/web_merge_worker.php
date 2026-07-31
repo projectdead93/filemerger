@@ -13,6 +13,12 @@ use App\Service\ProgressTracker;
 
 [$scriptName, $jobId, $sourceDir, $outputDir] = $argv;
 
+file_put_contents(
+    __DIR__ . '/../storage/logs/worker_debug.log',
+    "jobId=$jobId\nsourceDir=$sourceDir\noutputDir=$outputDir\n",
+    FILE_APPEND
+);
+
 $baseConfig = require __DIR__ . '/../config/config.php';
 
 $logDir = $baseConfig['log_dir'] . DIRECTORY_SEPARATOR . $jobId;

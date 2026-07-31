@@ -58,7 +58,9 @@ class WebMergeController
         );
 
         // Windows: "start /B" runs detached without opening a new window
-        pclose(popen('start /B ' . $cmd, 'r'));
+        // pclose(popen($cmd, 'r'));
+        $shell = new \COM('WScript.Shell');
+        $shell->Run($cmd, 0, false);
     }
 
     public function showStatus(string $jobId): void
