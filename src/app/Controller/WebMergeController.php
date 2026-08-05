@@ -17,13 +17,14 @@ class WebMergeController
 
     public function handleUpload(array $files, string $userOutputDir): void
     {
-        file_put_contents(__DIR__ . '/../../../storage/logs/reached.txt', 'handleUpload was called at ' . date('H:i:s'));
-    die('STOPPED HERE FOR DEBUG');
+        $t0 = microtime(true);
+        $debugLog = $this->config['log_dir'] . DIRECTORY_SEPARATOR . 'upload_timing_debug.log';
 
-         $t0 = microtime(true);
-    $debugLog = $this->config['log_dir'] . DIRECTORY_SEPARATOR . 'upload_timing_debug.log';
-    $log = fn($label) => file_put_contents($debugLog, sprintf("%s: %.3fs\n", $label, microtime(true) - $t0), FILE_APPEND);
+        if (!is_dir($this->config['log_dir'])) {
+            mkdir($this->config['log_dir'], 0777, true);
+        }
 
+        $log = fn($label) => file_put_contents($debugLog, sprintf("%s: %.3fs\n", $label, microtime(true) - $t0), FILE_APPEND);
         $log('start');
 
         if (empty($files) || empty($userOutputDir)) {
@@ -31,8 +32,8 @@ class WebMergeController
             echo "Missing files or output directory.";
             return;
         }
-       $log('after validation');
-         
+        $log('after validation');
+
         if (!is_dir($userOutputDir)) {
             if (!mkdir($userOutputDir, 0777, true)) {
                 http_response_code(400);
@@ -42,23 +43,19 @@ class WebMergeController
         }
         $log('after mkdir output dir');
 
-
         $uploader = new UploadHandler($this->config['upload_dir']);
         $jobDir = $uploader->handle($files);
-
         $log('after UploadHandler::handle');
 
         $jobId = basename($jobDir);
-        $log('after UploadHandler::handle');
+        $log('after basename jobDir');
 
-        // Launch the merge as a background process, pointing at the uploaded files
-        // and the user-specified output directory
         $this->launchBackgroundMerge($jobId, $jobDir, $userOutputDir);
         $log('after launchBackgroundMerge');
 
-        // Redirect user to a status page they can poll
         header("Location: /index.php?action=status&job_id=$jobId");
         $log('after header redirect');
+
     }
 
     private function launchBackgroundMerge(string $jobId, string $sourceDir, string $outputDir): void
@@ -66,14 +63,19 @@ class WebMergeController
         $phpBinary = PHP_BINARY; // path to php.exe currently running
         $script = realpath(__DIR__ . '/../../../bin/web_merge_worker.php');
 
-        $cmd = sprintf(
-            '%s %s %s %s %s',
-            escapeshellarg($phpBinary),
-            escapeshellarg($script),
-            escapeshellarg($jobId),
-            escapeshellarg($sourceDir),
-            escapeshellarg($outputDir)
-        );
+         $errorLog = $this->config['log_dir'] . DIRECTORY_SEPARATOR . "worker_error_{$jobId}.log";
+
+    $innerCmd = sprintf(
+        '%s %s %s %s %s > %s 2>&1',
+        escapeshellarg($phpBinary),
+        escapeshellarg($script),
+        escapeshellarg($jobId),
+        escapeshellarg($sourceDir),
+        escapeshellarg($outputDir),
+        escapeshellarg($errorLog)
+    );
+
+         $cmd = 'cmd /c "' . $innerCmd . '"';
 
         // Windows: "start /B" runs detached without opening a new window
         $shell = new \COM('WScript.Shell');
@@ -91,8 +93,5 @@ class WebMergeController
         $batchesFile = $logDir . DIRECTORY_SEPARATOR . 'batches.csv';
 
         require __DIR__ . '/../../../resources/views/progress.php';
-
-        $path = __DIR__ . '/../../../resources/views/progress.php';
-        echo realpath($path) ?: "NOT FOUND: $path";
     }
 }

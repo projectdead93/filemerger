@@ -31,7 +31,7 @@ $reporter        = new ProgressReporter($progressTracker);
 $batchQueue      = new BatchQueue($validator, $progressTracker, $baseConfig['max_bytes']);
 $merger          = new PdfMerger($baseConfig['qpdf_path'], $tempDir, $logger);
 
-$controller = new MergeController($batchQueue, $merger, $progressTracker, $reporter, $logger, $outputDir);
+$controller = new MergeController($batchQueue, $merger, $outputDir, $logger, $progressTracker, $reporter);
 
 $scanner = new FileScanner();
 $fileStream = $scanner->scan($sourceDir);

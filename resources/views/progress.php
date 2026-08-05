@@ -1,11 +1,22 @@
+<?php
+$doneFlag = $logDir . DIRECTORY_SEPARATOR . 'done.flag';
+$isDone = file_exists($doneFlag);
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Merge Progress</title>
-    <meta http-equiv="refresh" content="3">
+    <?php if (!$isDone): ?>
+        <meta http-equiv="refresh" content="3">
+    <?php endif; ?>
 </head>
 <body>
     <h1>Job: <?= htmlspecialchars($jobId) ?></h1>
+
+    <?php if ($isDone): ?>
+        <p><strong>✅ Job complete.</strong></p>
+    <?php endif; ?>
 
     <?php if (file_exists($batchesFile)): ?>
         <table border="1" cellpadding="5">
@@ -14,6 +25,9 @@
             $rows = array_map('str_getcsv', file($batchesFile));
             $header = array_shift($rows);
             foreach ($rows as $row):
+                if (count($row) < 7) {
+                    continue;
+                }
                 [$timestamp, $batchNum, $output, $fileCount, $bytes, $success, $error] = $row;
             ?>
             <tr>
