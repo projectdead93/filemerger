@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 require __DIR__ . '/../vendor/autoload.php';
 
 use App\Controller\MergeController;
@@ -12,6 +14,12 @@ use App\Service\ProgressReporter;
 use App\Service\ProgressTracker;
 
 [$scriptName, $jobId, $sourceDir, $outputDir] = $argv;
+
+file_put_contents(
+    __DIR__ . '/../storage/logs/worker_debug.log',
+    "jobId=$jobId\nsourceDir=$sourceDir\noutputDir=$outputDir\n",
+    FILE_APPEND
+);
 
 $baseConfig = require __DIR__ . '/../config/config.php';
 
@@ -36,4 +44,6 @@ $controller = new MergeController($batchQueue, $merger, $outputDir, $logger, $pr
 $scanner = new FileScanner();
 $fileStream = $scanner->scan($sourceDir);
 
-$controller->run($fileStream, 'merged');
+$controller->run($fileStream, 'merged' .$jobId);
+
+file_put_contents($logDir . DIRECTORY_SEPARATOR . 'done.flag', 'complete');

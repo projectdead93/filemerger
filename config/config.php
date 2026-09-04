@@ -7,4 +7,5 @@ return [
     'temp_dir'     => 'C:\\Users\\alxvk\\Documents\\filemergerfiles\\storage\\temp',
     'output_dir'   => 'C:\\Users\\alxvk\\Documents\\filemergerfiles\\storage\\output',
     'log_dir'      => 'C:\\Users\\alxvk\\Documents\\filemergerfiles\\storage\\logs',
+    'upload_dir' => __DIR__ . '/../storage/uploads',
 ];
